@@ -1,15 +1,19 @@
 package ma.enset.eventsourcingcqrsaxonframework.commands.aggregates;
 
+import lombok.extern.slf4j.Slf4j;
 import ma.enset.eventsourcingcqrsaxonframework.commands.commands.AddAccountCommand;
 import ma.enset.eventsourcingcqrsaxonframework.enums.AccountStatus;
 import ma.enset.eventsourcingcqrsaxonframework.events.AccountCreatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 @Aggregate
+@Slf4j
 public class AccountAggregate {
+    @AggregateIdentifier
     private String accountId;
     private double balance;
     private AccountStatus status;
@@ -20,6 +24,7 @@ public class AccountAggregate {
     //For handling command
     @CommandHandler
     public AccountAggregate(AddAccountCommand command) {
+        log.info("Handling AddAccountCommand: {}", command);
         //here we verify the command data (business logic)
         if (command.getInitialBalance()<=0) throw new IllegalArgumentException("Initial balance must be greater than zero");
         //everything is ok! so now we can apply event (we must create event first)
@@ -33,6 +38,7 @@ public class AccountAggregate {
     //for handling event and updating the aggregate state
     @EventSourcingHandler
     public void on(AccountCreatedEvent event){
+        log.info("Handling AccountCreatedEvent: {}", event);
         this.accountId= event.getAccountId();
         this.balance= event.getInitialBalance();
         this.status= event.getAccountStatus();
