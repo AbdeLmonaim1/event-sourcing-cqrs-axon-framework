@@ -1,0 +1,33 @@
+
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=event-sourcing-accounts_db'
+      - 'POSTGRES_PASSWORD=1234'
+      - 'POSTGRES_USER=admin'
+    volumes:
+      - event-sourcing-accounts_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - event-sourcing-accounts-net
+  pgadmin4:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8088:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: med@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: azer
+    volumes:
+      - event-sourcing-accounts_pgadmin_data:/var/lib/pgadmin
+    networks:
+      - event-sourcing-accounts-net
+volumes:
+  event-sourcing-accounts_data:
+  event-sourcing-accounts_pgadmin_data:
+
+networks:
+  event-sourcing-accounts-net:
+    driver: bridge
