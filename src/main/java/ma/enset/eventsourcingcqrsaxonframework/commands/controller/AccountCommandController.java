@@ -3,10 +3,7 @@ package ma.enset.eventsourcingcqrsaxonframework.commands.controller;
 import ma.enset.eventsourcingcqrsaxonframework.commands.commands.AddAccountCommand;
 import ma.enset.eventsourcingcqrsaxonframework.commands.dtos.AddNewAccountRequestDTO;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -28,5 +25,10 @@ public class AccountCommandController {
                 requestDTO.currency()
         ));
         return response;
+    }
+    //For returning exception messages in case of exceptions of any type
+    @ExceptionHandler(Exception.class)
+    public String exceptionHandler(Exception e){
+        return e.getMessage();
     }
 }
