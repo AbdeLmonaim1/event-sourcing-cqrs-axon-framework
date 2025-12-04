@@ -1,13 +1,13 @@
 
 services:
   postgres:
-    image: 'postgres:latest'
+    image: 'postgres:16-alpine'
     environment:
-      - 'POSTGRES_DB=event-sourcing-accounts_db'
+      - 'POSTGRES_DB=event_sourcing_accounts_db'
       - 'POSTGRES_PASSWORD=1234'
       - 'POSTGRES_USER=admin'
     volumes:
-      - event-sourcing-accounts_data:/var/lib/postgresql/data
+      - event_sourcing_accounts_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     networks:
@@ -18,15 +18,15 @@ services:
     ports:
       - "8088:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: med@gmail.com
+      PGADMIN_DEFAULT_EMAIL: monaim@gmail.com
       PGADMIN_DEFAULT_PASSWORD: azer
     volumes:
-      - event-sourcing-accounts_pgadmin_data:/var/lib/pgadmin
+      - event_sourcing_accounts_pgadmin_data:/var/lib/pgadmin
     networks:
       - event-sourcing-accounts-net
 volumes:
-  event-sourcing-accounts_data:
-  event-sourcing-accounts_pgadmin_data:
+  event_sourcing_accounts_data:
+  event_sourcing_accounts_pgadmin_data:
 
 networks:
   event-sourcing-accounts-net:
