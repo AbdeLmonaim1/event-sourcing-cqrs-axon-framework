@@ -2,8 +2,11 @@ package ma.enset.eventsourcingcqrsaxonframework.commands.aggregates;
 
 import lombok.extern.slf4j.Slf4j;
 import ma.enset.eventsourcingcqrsaxonframework.commands.commands.AddAccountCommand;
+import ma.enset.eventsourcingcqrsaxonframework.commands.commands.CreditAccountCommand;
 import ma.enset.eventsourcingcqrsaxonframework.enums.AccountStatus;
+import ma.enset.eventsourcingcqrsaxonframework.events.AccountActivatedEvent;
 import ma.enset.eventsourcingcqrsaxonframework.events.AccountCreatedEvent;
+import ma.enset.eventsourcingcqrsaxonframework.events.AccountCreditedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -34,6 +37,11 @@ public class AccountAggregate {
                 AccountStatus.CREATED,
               command.getCurrency()
         ));
+        //An other event - activate account
+        AggregateLifecycle.apply(new AccountActivatedEvent(
+                command.getId(),
+                AccountStatus.ACTIVATED
+        ));
     }
     //for handling event and updating the aggregate state
     @EventSourcingHandler
@@ -42,5 +50,27 @@ public class AccountAggregate {
         this.accountId= event.getAccountId();
         this.balance= event.getInitialBalance();
         this.status= event.getAccountStatus();
+    }
+
+    //For handling command
+    @CommandHandler
+    public void handleCreditCommand(CreditAccountCommand command) {
+        log.info("Handling CreditAccountCommand: {}", command);
+        //here we verify the command data (business logic)
+        if (!status.equals(AccountStatus.ACTIVATED)) throw new RuntimeException("The account "+command.getId()+" is not ACTIVATED");
+        if (command.getAmount()<=0) throw new IllegalArgumentException("The amount must be greater than zero");
+        //everything is ok! so now we can apply event (we must create event first)
+        AggregateLifecycle.apply(new AccountCreditedEvent(
+                command.getId(),
+                command.getAmount(),
+                command.getCurrency()
+        ));
+    }
+    //for handling event and updating the aggregate state
+    @EventSourcingHandler
+    public void on(AccountCreditedEvent event){
+        log.info("Handling AccountCreditedEvent: {}", event);
+        this.accountId= event.getAccountId();
+        this.balance= this.balance + event.getAmount();
     }
 }
