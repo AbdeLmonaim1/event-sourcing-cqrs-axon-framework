@@ -2,8 +2,13 @@ package ma.enset.eventsourcingcqrsaxonframework.commands.controller;
 
 import ma.enset.eventsourcingcqrsaxonframework.commands.commands.AddAccountCommand;
 import ma.enset.eventsourcingcqrsaxonframework.commands.commands.CreditAccountCommand;
+import ma.enset.eventsourcingcqrsaxonframework.commands.commands.DebitAccountCommand;
+import ma.enset.eventsourcingcqrsaxonframework.commands.commands.UpdateAccountStatusCommand;
 import ma.enset.eventsourcingcqrsaxonframework.commands.dtos.AddNewAccountRequestDTO;
 import ma.enset.eventsourcingcqrsaxonframework.commands.dtos.CreditAccountRequestDTO;
+import ma.enset.eventsourcingcqrsaxonframework.commands.dtos.DebitAccountRequestDTO;
+import ma.enset.eventsourcingcqrsaxonframework.commands.dtos.UpdateAccountStatusRequestDTO;
+import ma.enset.eventsourcingcqrsaxonframework.enums.AccountStatus;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +40,31 @@ public class AccountCommandController {
     }
 
     @PostMapping("/credit")
-    public CompletableFuture<String> addNewAccount(@RequestBody CreditAccountRequestDTO requestDTO) {
+    public CompletableFuture<String> creditAccount(@RequestBody CreditAccountRequestDTO requestDTO) {
         //TO dispatch a command (CreditAccountCommand) to Command Bus we use CommandGateway
         CompletableFuture<String> response = commandGateway.send(new CreditAccountCommand(
                 requestDTO.accountId(),
                 requestDTO.amount(),
                 requestDTO.currency()
+        ));
+        return response;
+    }
+    @PostMapping("/debit")
+    public CompletableFuture<String> debitAccount(@RequestBody DebitAccountRequestDTO requestDTO) {
+        //TO dispatch a command (DebitAccountCommand) to Command Bus we use CommandGateway
+        CompletableFuture<String> response = commandGateway.send(new DebitAccountCommand(
+                requestDTO.accountId(),
+                requestDTO.amount(),
+                requestDTO.currency()
+        ));
+        return response;
+    }
+    @PutMapping("/updateStatus")
+    public CompletableFuture<String> debitAccount(@RequestBody UpdateAccountStatusRequestDTO requestDTO) {
+        //TO dispatch a command (UpdateAccountStatusCommand) to Command Bus we use CommandGateway
+        CompletableFuture<String> response = commandGateway.send(new UpdateAccountStatusCommand(
+                requestDTO.accountId(),
+                requestDTO.status()
         ));
         return response;
     }
